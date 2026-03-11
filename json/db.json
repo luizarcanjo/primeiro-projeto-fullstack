@@ -1,0 +1,48 @@
+{
+  "alunos": [
+    {
+      "name": "luiz arcanjo",
+      "idade": 20,
+      "sexo": "masculino",
+      "curso": "Ciencia da Computacao",
+      "id": 1
+    },
+    {
+      "name": "maria sirlene",
+      "idade": 10,
+      "sexo": "feminino",
+      "curso": "direito",
+      "id": 2
+    },
+    {
+      "id": 3,
+      "name": "Amalia",
+      "idade": 23,
+      "sexo": "outro",
+      "curso": "ciencia da computacao"
+    },
+    {
+      "name": "amaro",
+      "idade": 30,
+      "sexo": "masculino",
+      "curso": "ads",
+      "id": 4
+    }
+  ],
+  "professores": [
+    {
+      "nome": "henning summer de melo",
+      "idade": 40,
+      "sexo": "masculino",
+      "cadeira": "full stack",
+      "id": 1
+    },
+    {
+      "nome": "paulo",
+      "email": "paulo@gmail.com",
+      "cell": 9999999999,
+      "idade": 37,
+      "id": 2
+    }
+  ]
+}
