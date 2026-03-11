@@ -43,6 +43,6 @@ fetch("https://miniature-space-guide-5wprjqv56v7h4q96-3000.app.github.dev/profes
             curso: document.getElementById("curso").value
         };
     });
-    fetch("https://miniature-space-guide-5wprjqv56v7h4q96-3000.app.github.dev/alunos")\
+    fetch("https://miniature-space-guide-5wprjqv56v7h4q96-3000.app.github.dev/alunos")
     .then((response) => response.json())
-    
+
