@@ -1,14 +1,14 @@
 {
   "alunos": [
     {
-      "name": "luiz arcanjo",
+      "nome": "luiz arcanjo",
       "idade": 20,
       "sexo": "masculino",
       "curso": "Ciencia da Computacao",
       "id": 1
     },
     {
-      "name": "maria sirlene",
+      "nome": "maria sirlene",
       "idade": 10,
       "sexo": "feminino",
       "curso": "direito",
@@ -16,13 +16,13 @@
     },
     {
       "id": 3,
-      "name": "Amalia",
+      "nome": "Amalia",
       "idade": 23,
       "sexo": "outro",
       "curso": "ciencia da computacao"
     },
     {
-      "name": "amaro",
+      "nome": "amaro",
       "idade": 30,
       "sexo": "masculino",
       "curso": "ads",
@@ -33,16 +33,18 @@
     {
       "nome": "henning summer de melo",
       "idade": 40,
-      "sexo": "masculino",
+      "numero": "11987654321",
       "cadeira": "full stack",
       "id": 1
     },
+  
     {
-      "nome": "paulo",
-      "email": "paulo@gmail.com",
-      "cell": 9999999999,
-      "idade": 37,
+      "nome": "lin tse ming",
+      "idade": 29,
+      "numero": "1234567890",
+      "cadeira": "redes",
       "id": 2
     }
+ 
   ]
 }

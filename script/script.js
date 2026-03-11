@@ -1,1 +1,0 @@
-fetch("https://miniature-space-guide-5wprjqv56v7h4q96-3000.app.github.dev/professores")
