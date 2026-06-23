@@ -11,10 +11,12 @@ app.use(express.json());
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var petsRouter = require('./routes/pets');
 
 //define os endpoints para as rotas
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/pets', petsRouter);
 
  
 // view engine setup 
