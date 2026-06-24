@@ -1,38 +1,129 @@
-<h1>
-    <%=title%>
-</h1>
+<h1><%=title%></h1>
 
-<form action="">
+<form id="userForm">
     <input type="hidden" id="id">
     <label for="username">nome</label>
-    <input name="username" id="username" type="text"><br>
+    <input name="username" id="username" type="text" required><br>
     <label for="password">senha</label>
-    <input name="password" id="password" type="text"><br>
+    <input name="password" id="password" type="password" required><br>
     <label for="email">email</label>
-    <input name="email" id="email" type="text"><br>
+    <input name="email" id="email" type="email" required><br>
     <label for="phone">telefone</label>
-    <input name="phone" id="phone" type="text"><br>
+    <input name="phone" id="phone" type="text" required><br>
     <button type="submit">Enviar</button>
-    <button type="reset">cancelar</button>
+    <button type="reset">Cancelar</button>
 </form>
 
 <%if(error){%>
-    <span><%=error%></span>
+    <span style="color: red;"><%=error%></span>
 <%}%>
 
-<table>
+<table border="1">
     <thead>
         <tr>
-            <%for(let col of cols){%>
-            <th><%=col%></th>
-            <%}%>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Senha</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>Ações</th>
         </tr>
     </thead>
     <tbody>
         <%for(let user of users){%>
-        <tr>
-           <td><%= user.username %></td>
-        </tr>
-         <%}%>
+            <tr>
+                <td><%=user.id%></td>
+                <td><%=user.username%></td>
+                <td><%=user.password%></td>
+                <td><%=user.email%></td>
+                <td><%=user.phone%></td>
+                <td>
+                    <button onclick="editarUsuario('<%=user.id%>')">Editar</button>
+                    <button onclick="deletarUsuario('<%=user.id%>')">Deletar</button>
+                </td>
+            </tr>
+        <%}%>
     </tbody>
 </table>
+
+<script>
+    const form = document.getElementById('userForm');
+    const idInput = document.getElementById('id');
+
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        
+        const user = {
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value,
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value
+        };
+
+        const id = idInput.value;
+        
+        if (id) {
+            atualizarUsuario(id, user);
+        } else {
+            criarUsuario(user);
+        }
+    });
+
+    function criarUsuario(user) {
+        fetch('/users/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(user)
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert('Usuário criado!');
+            form.reset();
+            idInput.value = '';
+            location.reload();
+        })
+        .catch(err => console.error('Erro:', err));
+    }
+
+    function atualizarUsuario(id, user) {
+        fetch(`/users/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(user)
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert('Usuário atualizado!');
+            form.reset();
+            idInput.value = '';
+            location.reload();
+        })
+        .catch(err => console.error('Erro:', err));
+    }
+
+    function editarUsuario(id) {
+        fetch(`/users/${id}`)
+            .then(res => res.json())
+            .then(user => {
+                document.getElementById('id').value = user.id;
+                document.getElementById('username').value = user.username;
+                document.getElementById('password').value = user.password;
+                document.getElementById('email').value = user.email;
+                document.getElementById('phone').value = user.phone;
+                form.scrollIntoView({ behavior: 'smooth' });
+            })
+            .catch(err => console.error('Erro:', err));
+    }
+
+    function deletarUsuario(id) {
+        if (confirm('Tem certeza?')) {
+            fetch(`/users/${id}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(data => {
+                    alert('Deletado!');
+                    location.reload();
+                })
+                .catch(err => console.error('Erro:', err));
+        }
+    }
+</script>
