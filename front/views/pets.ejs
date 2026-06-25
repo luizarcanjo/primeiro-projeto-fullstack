@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        nav { background: #333; color: white; padding: 15px 0; }
+        nav a { color: white; margin: 0 20px; text-decoration: none; }
+        nav a:hover { color: #FF9800; }
+        main { max-width: 1200px; margin: 20px auto; padding: 20px; background: white; border-radius: 8px; }
+        h1 { margin-bottom: 20px; color: #333; }
+        form { background: #f9f9f9; padding: 20px; border-radius: 5px; margin-bottom: 30px; }
+        form label { display: block; margin-top: 10px; font-weight: bold; }
+        form input, form select { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; }
+        form button { margin-top: 15px; padding: 10px 20px; margin-right: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        form button[type="submit"] { background: #FF9800; color: white; }
+        form button[type="reset"] { background: #999; color: white; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #FF9800; color: white; }
+        tr:hover { background: #f5f5f5; }
+        .btn { padding: 6px 12px; margin: 0 5px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-editar { background: #2196F3; color: white; }
+        .btn-deletar { background: #f44336; color: white; }
+        .error { color: red; margin-bottom: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/">🏠 Home</a>
+        <a href="/users">👥 Usuários</a>
+        <a href="/pets">🐾 Pets</a>
+    </nav>
+    <main>
+        <h1><%= title %></h1>
+        <form id="petForm">
+            <input type="hidden" id="id">
+            <label for="name">Nome do Pet</label>
+            <input name="name" id="name" type="text" required><br>
+            <label for="type">Tipo</label>
+            <select name="type" id="type" required>
+                <option value="">Selecione...</option>
+                <option value="Cachorro">Cachorro</option>
+                <option value="Gato">Gato</option>
+                <option value="Passaro">Pássaro</option>
+                <option value="Coelho">Coelho</option>
+                <option value="Hamster">Hamster</option>
+                <option value="Tartaruga">Tartaruga</option>
+                <option value="Outro">Outro</option>
+            </select><br>
+            <label for="race">Raça</label>
+            <input name="race" id="race" type="text" required><br>
+            <label for="colour">Cor</label>
+            <input name="colour" id="colour" type="text" required><br>
+            <label for="gender">Gênero</label>
+            <select name="gender" id="gender" required>
+                <option value="">Selecione...</option>
+                <option value="Macho">Macho</option>
+                <option value="Fêmea">Fêmea</option>
+            </select><br>
+            <button type="submit">Enviar</button>
+            <button type="reset">Cancelar</button>
+        </form>
+        <% if(error){ %><div class="error"><%= error %></div><% } %>
+        <table border="1">
+            <thead><tr><th>ID</th><th>Nome</th><th>Tipo</th><th>Raça</th><th>Cor</th><th>Gênero</th><th>Ações</th></tr></thead>
+            <tbody>
+                <% for(let pet of pets){ %>
+                    <tr>
+                        <td><%= pet.id %></td>
+                        <td><%= pet.name %></td>
+                        <td><%= pet.type %></td>
+                        <td><%= pet.race %></td>
+                        <td><%= pet.colour %></td>
+                        <td><%= pet.gender %></td>
+                        <td>
+                            <button class="btn btn-editar" onclick="editarPet('<%= pet.id %>')">Editar</button>
+                            <button class="btn btn-deletar" onclick="deletarPet('<%= pet.id %>')">Deletar</button>
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </main>
+    <script>
+        const form = document.getElementById('petForm');
+        const idInput = document.getElementById('id');
+
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const pet = {
+                name: document.getElementById('name').value,
+                type: document.getElementById('type').value,
+                race: document.getElementById('race').value,
+                colour: document.getElementById('colour').value,
+                gender: document.getElementById('gender').value
+            };
+            if (idInput.value) {
+                atualizarPet(idInput.value, pet);
+            } else {
+                criarPet(pet);
+            }
+        });
+
+        function criarPet(pet) {
+            fetch('/pets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(pet)
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert('Pet criado!');
+                form.reset();
+                idInput.value = '';
+                location.reload();
+            })
+            .catch(err => console.error('Erro:', err));
+        }
+
+        function atualizarPet(id, pet) {
+            fetch(`/pets/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(pet)
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert('Pet atualizado!');
+                form.reset();
+                idInput.value = '';
+                location.reload();
+            })
+            .catch(err => console.error('Erro:', err));
+        }
+
+        function editarPet(id) {
+            fetch(`/pets/${id}`)
+                .then(res => res.json())
+                .then(pet => {
+                    document.getElementById('id').value = pet.id;
+                    document.getElementById('name').value = pet.name;
+                    document.getElementById('type').value = pet.type;
+                    document.getElementById('race').value = pet.race;
+                    document.getElementById('colour').value = pet.colour;
+                    document.getElementById('gender').value = pet.gender;
+                    form.scrollIntoView({ behavior: 'smooth' });
+                })
+                .catch(err => console.error('Erro:', err));
+        }
+
+        function deletarPet(id) {
+            if (confirm('Tem certeza?')) {
+                fetch(`/pets/${id}`, { method: 'DELETE' })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert('Pet deletado!');
+                        location.reload();
+                    })
+                    .catch(err => console.error('Erro:', err));
+            }
+        }
+    </script>
+</body>
+</html>
