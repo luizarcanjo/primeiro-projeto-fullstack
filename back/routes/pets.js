@@ -4,7 +4,7 @@ var sqlite3 = require("sqlite3");
 
 const db = new sqlite3.Database('./database/database.db');
 
-// Criar tabela pets
+// Criar tabela pets com user_id
 db.run(`
   CREATE TABLE IF NOT EXISTS pets(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -12,7 +12,9 @@ db.run(`
     type TEXT,
     race TEXT,
     colour TEXT,
-    gender TEXT
+    gender TEXT,
+    user_id INTEGER,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   )
 `, (err) => {
   if (err) {
@@ -22,13 +24,17 @@ db.run(`
   }
 });
 
-// POST - Criar pet
+// POST - Criar pet com tutor
 router.post('/', (req, res) => {
-  const { name, type, race, colour, gender } = req.body;
+  const { name, type, race, colour, gender, user_id } = req.body;
+
+  if (!user_id) {
+    return res.status(400).json({ error: 'user_id é obrigatório' });
+  }
 
   db.run(
-    'INSERT INTO pets (name, type, race, colour, gender) VALUES (?, ?, ?, ?, ?)',
-    [name, type, race, colour, gender],
+    'INSERT INTO pets (name, type, race, colour, gender, user_id) VALUES (?, ?, ?, ?, ?, ?)',
+    [name, type, race, colour, gender, user_id],
     (err) => {
       if (err) {
         console.error('Erro ao cadastrar pet:', err);
@@ -39,9 +45,15 @@ router.post('/', (req, res) => {
   );
 });
 
-// GET - Listar todos
+// GET - Listar todos com dados do tutor
 router.get('/', (req, res) => {
-  db.all('SELECT * FROM pets', (err, pets) => {
+  const sql = `
+    SELECT p.*, u.username as tutor_name
+    FROM pets p
+    LEFT JOIN users u ON p.user_id = u.id
+  `;
+
+  db.all(sql, (err, pets) => {
     if (err) {
       console.error('Erro ao buscar pets:', err);
       return res.status(500).json({ error: 'Erro ao buscar pets' });
@@ -50,11 +62,38 @@ router.get('/', (req, res) => {
   });
 });
 
-// GET - Por ID
+// GET - Pets de um usuário específico
+router.get('/user/:user_id', (req, res) => {
+  const { user_id } = req.params;
+
+  const sql = `
+    SELECT p.*, u.username as tutor_name
+    FROM pets p
+    LEFT JOIN users u ON p.user_id = u.id
+    WHERE p.user_id = ?
+  `;
+
+  db.all(sql, [user_id], (err, pets) => {
+    if (err) {
+      console.error('Erro ao buscar pets do usuário:', err);
+      return res.status(500).json({ error: 'Erro ao buscar pets' });
+    }
+    res.status(200).json(pets);
+  });
+});
+
+// GET - Pet por ID
 router.get('/:id', (req, res) => {
   const { id } = req.params;
 
-  db.get('SELECT * FROM pets WHERE id = ?', [id], (err, row) => {
+  const sql = `
+    SELECT p.*, u.username as tutor_name
+    FROM pets p
+    LEFT JOIN users u ON p.user_id = u.id
+    WHERE p.id = ?
+  `;
+
+  db.get(sql, [id], (err, row) => {
     if (err) {
       console.error('Erro ao buscar pet:', err);
       return res.status(500).json({ error: 'Erro ao buscar pet' });
@@ -66,28 +105,30 @@ router.get('/:id', (req, res) => {
   });
 });
 
-// PUT - Atualizar
+// PUT - Atualizar pet
 router.put('/:id', (req, res) => {
   const { id } = req.params;
-  const { name, type, race, colour, gender } = req.body;
+  const { name, type, race, colour, gender, user_id } = req.body;
 
-  db.run(
-    'UPDATE pets SET name = ?, type = ?, race = ?, colour = ?, gender = ? WHERE id = ?',
-    [name, type, race, colour, gender, id],
-    function(err) {
-      if (err) {
-        console.error('Erro ao atualizar pet:', err);
-        return res.status(500).json({ error: 'Erro ao atualizar pet' });
-      }
-      if (this.changes === 0) {
-        return res.status(404).json({ error: 'Pet não encontrado' });
-      }
-      res.status(200).json({ message: 'Pet atualizado com sucesso' });
+  const sql = `
+    UPDATE pets 
+    SET name = ?, type = ?, race = ?, colour = ?, gender = ?, user_id = ?
+    WHERE id = ?
+  `;
+
+  db.run(sql, [name, type, race, colour, gender, user_id, id], function(err) {
+    if (err) {
+      console.error('Erro ao atualizar pet:', err);
+      return res.status(500).json({ error: 'Erro ao atualizar pet' });
     }
-  );
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'Pet não encontrado' });
+    }
+    res.status(200).json({ message: 'Pet atualizado com sucesso' });
+  });
 });
 
-// DELETE - Deletar
+// DELETE - Deletar pet
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
 

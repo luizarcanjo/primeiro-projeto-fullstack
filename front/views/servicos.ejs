@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serviços - Petshop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        nav { background: #333; color: white; padding: 15px 0; }
+        nav a { color: white; margin: 0 20px; text-decoration: none; }
+        nav a:hover { color: #FF9800; }
+        nav button { background: #d32f2f; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin: 0 20px; }
+        main { max-width: 1200px; margin: 20px auto; padding: 20px; background: white; border-radius: 8px; }
+        h1 { margin-bottom: 20px; color: #333; }
+        form { background: #f9f9f9; padding: 20px; border-radius: 5px; margin-bottom: 30px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button[type="submit"] { background: #FF9800; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button[type="submit"]:hover { background: #F57C00; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #FF9800; color: white; }
+        .btn { padding: 6px 12px; margin: 0 5px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-editar { background: #2196F3; color: white; }
+        .btn-deletar { background: #f44336; color: white; }
+        .error { color: #d32f2f; margin-bottom: 10px; }
+        .success { color: #4CAF50; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/">🏠 Home</a>
+        <a href="/servicos">🛁 Serviços</a>
+        <a href="/pets">🐾 Pets</a>
+        <a href="/users">👥 Usuários</a>
+        <button onclick="logout()">Sair</button>
+    </nav>
+
+    <main>
+        <h1>🛁 Gestão de Serviços</h1>
+
+        <div id="message"></div>
+
+        <form id="servicoForm">
+            <input type="hidden" id="id">
+            <div class="form-group">
+                <label for="name">Nome do Serviço</label>
+                <input type="text" id="name" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Descrição</label>
+                <textarea id="description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="price">Preço</label>
+                <input type="number" id="price" step="0.01" required>
+            </div>
+            <button type="submit">Salvar</button>
+            <button type="reset" style="background: #999;">Cancelar</button>
+        </form>
+
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Descrição</th>
+                    <th>Preço</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="servicosTable">
+            </tbody>
+        </table>
+    </main>
+
+    <script>
+        // Variáveis globais - [Seu Nome]
+        const API_URL = 'http://localhost:3000/servicos';
+        const token = localStorage.getItem('token');
+
+        // Verificar autenticação - [Seu Nome]
+        if (!token) {
+            alert('Você precisa estar autenticado');
+            window.location.href = '/login';
+        }
+
+        // Carregar serviços ao iniciar - [Seu Nome]
+        carregarServicos();
+
+        // Formulário submit - [Seu Nome]
+        document.getElementById('servicoForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('id').value;
+            const servico = {
+                name: document.getElementById('name').value,
+                description: document.getElementById('description').value,
+                price: parseFloat(document.getElementById('price').value)
+            };
+
+            if (id) {
+                atualizarServico(id, servico);
+            } else {
+                criarServico(servico);
+            }
+        });
+
+        // Carregar serviços - [Seu Nome]
+        function carregarServicos() {
+            fetch(API_URL, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(servicos => {
+                const tabela = document.getElementById('servicosTable');
+                tabela.innerHTML = '';
+                
+                if (Array.isArray(servicos) && servicos.length > 0) {
+                    servicos.forEach(s => {
+                        const row = `
+                            <tr>
+                                <td>${s.id}</td>
+                                <td>${s.name}</td>
+                                <td>${s.description || '-'}</td>
+                                <td>R$ ${s.price.toFixed(2)}</td>
+                                <td>
+                                    <button class="btn btn-editar" onclick="editarServico(${s.id})">Editar</button>
+                                    <button class="btn btn-deletar" onclick="deletarServico(${s.id})">Deletar</button>
+                                </td>
+                            </tr>
+                        `;
+                        tabela.innerHTML += row;
+                    });
+                } else {
+                    tabela.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum serviço cadastrado</td></tr>';
+                }
+            })
+            .catch(err => {
+                console.error('Erro ao carregar:', err);
+                mostrarMensagem('Erro ao carregar serviços', 'error');
+            });
+        }
+
+        // Criar serviço - [Seu Nome]
+        function criarServico(servico) {
+            fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(servico)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.message) {
+                    mostrarMensagem('Serviço criado com sucesso!', 'success');
+                    document.getElementById('servicoForm').reset();
+                    carregarServicos();
+                } else {
+                    mostrarMensagem(data.error || 'Erro ao criar', 'error');
+                }
+            })
+            .catch(err => mostrarMensagem('Erro na conexão', 'error'));
+        }
+
+        // Editar serviço - [Seu Nome]
+        function editarServico(id) {
+            fetch(`${API_URL}/${id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(servico => {
+                document.getElementById('id').value = servico.id;
+                document.getElementById('name').value = servico.name;
+                document.getElementById('description').value = servico.description || '';
+                document.getElementById('price').value = servico.price;
+                document.querySelector('button[type="submit"]').textContent = 'Atualizar';
+            })
+            .catch(err => mostrarMensagem('Erro ao buscar serviço', 'error'));
+        }
+
+        // Atualizar serviço - [Seu Nome]
+        function atualizarServico(id, servico) {
+            fetch(`${API_URL}/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(servico)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.message) {
+                    mostrarMensagem('Serviço atualizado!', 'success');
+                    document.getElementById('servicoForm').reset();
+                    document.getElementById('id').value = '';
+                    document.querySelector('button[type="submit"]').textContent = 'Salvar';
+                    carregarServicos();
+                } else {
+                    mostrarMensagem(data.error || 'Erro ao atualizar', 'error');
+                }
+            })
+            .catch(err => mostrarMensagem('Erro na conexão', 'error'));
+        }
+
+        // Deletar serviço - [Seu Nome]
+        function deletarServico(id) {
+            if (confirm('Tem certeza?')) {
+                fetch(`${API_URL}/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    mostrarMensagem('Serviço deletado!', 'success');
+                    carregarServicos();
+                })
+                .catch(err => mostrarMensagem('Erro ao deletar', 'error'));
+            }
+        }
+
+        // Logout - [Seu Nome]
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+        }
+
+        // Mostrar mensagem - [Seu Nome]
+        function mostrarMensagem(msg, tipo) {
+            const div = document.getElementById('message');
+            div.textContent = msg;
+            div.className = tipo;
+            setTimeout(() => div.textContent = '', 3000);
+        }
+    </script>
+</body>
+</html>

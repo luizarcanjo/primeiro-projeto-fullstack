@@ -1,37 +1,61 @@
 var express = require('express');
 var router = express.Router();
 const API_URL = "http://localhost:3000/pets";
+const USERS_API_URL = "http://localhost:3000/users";
 
+// GET - Listar pets e usuários para o dropdown
 router.get('/', function (req, res) {
-  fetch(API_URL, { method: 'GET' })
-    .then(async (response) => {
-      if(!response.ok) throw await response.json();
-      return response.json();
-    })
-    .then((pets) => {
+  Promise.all([
+    fetch(API_URL)
+      .then(response => {
+        if (!response.ok) throw new Error('Erro ao buscar pets');
+        return response.json();
+      })
+      .catch(err => {
+        console.error('Erro fetch pets:', err);
+        return [];
+      }),
+    fetch(USERS_API_URL)
+      .then(response => {
+        if (!response.ok) throw new Error('Erro ao buscar usuários');
+        return response.json();
+      })
+      .catch(err => {
+        console.error('Erro fetch usuários:', err);
+        return [];
+      })
+  ])
+    .then(([pets, users]) => {
+      // Garante que são arrays
+      const petsArray = Array.isArray(pets) ? pets : [];
+      const usersArray = Array.isArray(users) ? users : [];
+      
       res.render('pets', { 
         title: 'Gestão de Pets',
-        pets: pets,
+        pets: petsArray,
+        users: usersArray,
         error: "" 
       });
     })
     .catch((error) => {
-      console.log('erro ao buscar pets', error);
+      console.log('erro ao buscar dados', error);
       res.render('pets', { 
         title: 'Gestão de Pets',
         pets: [],
-        error: "Erro ao carregar pets" 
+        users: [],
+        error: "Erro ao carregar dados" 
       });
     });
 });
 
+// POST - Criar pet com tutor
 router.post('/', function (req, res) {
-  const { name, type, race, colour, gender } = req.body;
+  const { name, type, race, colour, gender, user_id } = req.body;
   
   fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, type, race, colour, gender })
+    body: JSON.stringify({ name, type, race, colour, gender, user_id })
   })
     .then(async (response) => {
       const data = await response.json();
@@ -46,6 +70,7 @@ router.post('/', function (req, res) {
     });
 });
 
+// GET - Pet por ID
 router.get('/:id', function (req, res) {
   const { id } = req.params;
   
@@ -62,14 +87,15 @@ router.get('/:id', function (req, res) {
     });
 });
 
+// PUT - Atualizar pet com tutor
 router.put('/:id', function (req, res) {
   const { id } = req.params;
-  const { name, type, race, colour, gender } = req.body;
+  const { name, type, race, colour, gender, user_id } = req.body;
   
   fetch(`${API_URL}/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, type, race, colour, gender })
+    body: JSON.stringify({ name, type, race, colour, gender, user_id })
   })
     .then(async (response) => {
       if(!response.ok) throw await response.json();
@@ -83,6 +109,7 @@ router.put('/:id', function (req, res) {
     });
 });
 
+// DELETE - Deletar pet
 router.delete('/:id', function (req, res) {
   const { id } = req.params;
   

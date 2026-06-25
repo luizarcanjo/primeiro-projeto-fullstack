@@ -22,10 +22,11 @@
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
         th { background: #FF9800; color: white; }
         tr:hover { background: #f5f5f5; }
-        .btn { padding: 6px 12px; margin: 0 5px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn { padding: 6px 12px; margin: 0 5px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
         .btn-editar { background: #2196F3; color: white; }
         .btn-deletar { background: #f44336; color: white; }
         .error { color: red; margin-bottom: 10px; font-weight: bold; }
+        .tutor-badge { background: #4CAF50; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -38,8 +39,10 @@
         <h1><%= title %></h1>
         <form id="petForm">
             <input type="hidden" id="id">
+            
             <label for="name">Nome do Pet</label>
             <input name="name" id="name" type="text" required><br>
+            
             <label for="type">Tipo</label>
             <select name="type" id="type" required>
                 <option value="">Selecione...</option>
@@ -51,53 +54,106 @@
                 <option value="Tartaruga">Tartaruga</option>
                 <option value="Outro">Outro</option>
             </select><br>
+            
             <label for="race">Raça</label>
             <input name="race" id="race" type="text" required><br>
+            
             <label for="colour">Cor</label>
             <input name="colour" id="colour" type="text" required><br>
+            
             <label for="gender">Gênero</label>
             <select name="gender" id="gender" required>
                 <option value="">Selecione...</option>
                 <option value="Macho">Macho</option>
                 <option value="Fêmea">Fêmea</option>
             </select><br>
+
+            <label for="user_id">👤 Tutor (Proprietário)</label>
+            <select name="user_id" id="user_id" required>
+                <option value="">Selecione um tutor...</option>
+                <% if(Array.isArray(users) && users.length > 0) { %>
+                    <% for(let user of users){ %>
+                        <option value="<%= user.id %>"><%= user.username %> (<%= user.email %>)</option>
+                    <% } %>
+                <% } else { %>
+                    <option disabled>Nenhum usuário disponível</option>
+                <% } %>
+            </select><br>
+            
             <button type="submit">Enviar</button>
             <button type="reset">Cancelar</button>
         </form>
+
         <% if(error){ %><div class="error"><%= error %></div><% } %>
+
         <table border="1">
-            <thead><tr><th>ID</th><th>Nome</th><th>Tipo</th><th>Raça</th><th>Cor</th><th>Gênero</th><th>Ações</th></tr></thead>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Raça</th>
+                    <th>Cor</th>
+                    <th>Gênero</th>
+                    <th>👤 Tutor</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
             <tbody>
-                <% for(let pet of pets){ %>
+                <% if(Array.isArray(pets) && pets.length > 0) { %>
+                    <% for(let pet of pets){ %>
+                        <tr>
+                            <td><%= pet.id %></td>
+                            <td><%= pet.name %></td>
+                            <td><%= pet.type %></td>
+                            <td><%= pet.race %></td>
+                            <td><%= pet.colour %></td>
+                            <td><%= pet.gender %></td>
+                            <td>
+                                <% if(pet.tutor_name){ %>
+                                    <span class="tutor-badge"><%= pet.tutor_name %></span>
+                                <% } else { %>
+                                    <span style="color: #999;">Sem tutor</span>
+                                <% } %>
+                            </td>
+                            <td>
+                                <button class="btn btn-editar" onclick="editarPet('<%= pet.id %>')">Editar</button>
+                                <button class="btn btn-deletar" onclick="deletarPet('<%= pet.id %>')">Deletar</button>
+                            </td>
+                        </tr>
+                    <% } %>
+                <% } else { %>
                     <tr>
-                        <td><%= pet.id %></td>
-                        <td><%= pet.name %></td>
-                        <td><%= pet.type %></td>
-                        <td><%= pet.race %></td>
-                        <td><%= pet.colour %></td>
-                        <td><%= pet.gender %></td>
-                        <td>
-                            <button class="btn btn-editar" onclick="editarPet('<%= pet.id %>')">Editar</button>
-                            <button class="btn btn-deletar" onclick="deletarPet('<%= pet.id %>')">Deletar</button>
+                        <td colspan="8" style="text-align: center; color: #999; padding: 20px;">
+                            Nenhum pet cadastrado
                         </td>
                     </tr>
                 <% } %>
             </tbody>
         </table>
     </main>
+
     <script>
         const form = document.getElementById('petForm');
         const idInput = document.getElementById('id');
 
         form.addEventListener("submit", (e) => {
             e.preventDefault();
+            
             const pet = {
                 name: document.getElementById('name').value,
                 type: document.getElementById('type').value,
                 race: document.getElementById('race').value,
                 colour: document.getElementById('colour').value,
-                gender: document.getElementById('gender').value
+                gender: document.getElementById('gender').value,
+                user_id: parseInt(document.getElementById('user_id').value)
             };
+
+            if (!pet.user_id) {
+                alert('Selecione um tutor!');
+                return;
+            }
+
             if (idInput.value) {
                 atualizarPet(idInput.value, pet);
             } else {
@@ -118,7 +174,10 @@
                 idInput.value = '';
                 location.reload();
             })
-            .catch(err => console.error('Erro:', err));
+            .catch(err => {
+                console.error('Erro:', err);
+                alert('Erro ao criar pet!');
+            });
         }
 
         function atualizarPet(id, pet) {
@@ -134,7 +193,10 @@
                 idInput.value = '';
                 location.reload();
             })
-            .catch(err => console.error('Erro:', err));
+            .catch(err => {
+                console.error('Erro:', err);
+                alert('Erro ao atualizar pet!');
+            });
         }
 
         function editarPet(id) {
@@ -147,20 +209,27 @@
                     document.getElementById('race').value = pet.race;
                     document.getElementById('colour').value = pet.colour;
                     document.getElementById('gender').value = pet.gender;
+                    document.getElementById('user_id').value = pet.user_id || '';
                     form.scrollIntoView({ behavior: 'smooth' });
                 })
-                .catch(err => console.error('Erro:', err));
+                .catch(err => {
+                    console.error('Erro:', err);
+                    alert('Erro ao buscar pet!');
+                });
         }
 
         function deletarPet(id) {
-            if (confirm('Tem certeza?')) {
+            if (confirm('Tem certeza que deseja deletar este pet?')) {
                 fetch(`/pets/${id}`, { method: 'DELETE' })
                     .then(res => res.json())
                     .then(data => {
                         alert('Pet deletado!');
                         location.reload();
                     })
-                    .catch(err => console.error('Erro:', err));
+                    .catch(err => {
+                        console.error('Erro:', err);
+                        alert('Erro ao deletar pet!');
+                    });
             }
         }
     </script>
