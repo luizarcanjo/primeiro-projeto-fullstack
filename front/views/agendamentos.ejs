@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamentos - Petshop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        nav { background: #333; color: white; padding: 15px 0; }
+        nav a { color: white; margin: 0 20px; text-decoration: none; }
+        nav a:hover { color: #FF9800; }
+        nav button { background: #d32f2f; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin: 0 20px; }
+        main { max-width: 1200px; margin: 20px auto; padding: 20px; background: white; border-radius: 8px; }
+        h1 { margin-bottom: 20px; color: #333; }
+        form { background: #f9f9f9; padding: 20px; border-radius: 5px; margin-bottom: 30px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button[type="submit"] { background: #FF9800; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: auto; }
+        button[type="submit"]:hover { background: #F57C00; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #FF9800; color: white; }
+        .btn { padding: 6px 12px; margin: 0 5px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-editar { background: #2196F3; color: white; }
+        .btn-deletar { background: #f44336; color: white; }
+        .success { color: #4CAF50; margin-bottom: 10px; }
+        .error { color: #d32f2f; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/">🏠 Home</a>
+        <a href="/servicos">🛁 Serviços</a>
+        <a href="/pets">🐾 Pets</a>
+        <a href="/agendamentos">📅 Agendamentos</a>
+        <a href="/users">👥 Usuários</a>
+        <button onclick="logout()">Sair</button>
+    </nav>
+
+    <main>
+        <h1>📅 Agendamentos de Serviços</h1>
+
+        <div id="message"></div>
+
+        <form id="agendamentoForm">
+            <input type="hidden" id="id">
+            
+            <div class="form-group">
+                <label for="pet_id">🐾 Pet</label>
+                <select id="pet_id" required>
+                    <option value="">Selecione um pet...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="servico_id">🛁 Serviço</label>
+                <select id="servico_id" required>
+                    <option value="">Selecione um serviço...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="user_id">👤 Tutor</label>
+                <select id="user_id" required>
+                    <option value="">Selecione um tutor...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="data_hora">📅 Data e Hora</label>
+                <input type="datetime-local" id="data_hora" required>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status">
+                    <option value="pendente">Pendente</option>
+                    <option value="confirmado">Confirmado</option>
+                    <option value="cancelado">Cancelado</option>
+                    <option value="concluido">Concluído</option>
+                </select>
+            </div>
+
+            <button type="submit">Agendar</button>
+            <button type="reset" style="background: #999; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: auto;">Cancelar</button>
+        </form>
+
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Pet</th>
+                    <th>Serviço</th>
+                    <th>Tutor</th>
+                    <th>Data/Hora</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="agendamentosTable">
+            </tbody>
+        </table>
+    </main>
+
+    <script>
+        // Variáveis globais - [Seu Nome]
+        const API_URL = 'https://fluffy-tribble-vx7r9vp5v7j2579-3000.app.github.dev/agendamentos';
+        const PETS_URL = 'https://fluffy-tribble-vx7r9vp5v7j2579-3000.app.github.dev/pets';
+        const SERVICOS_URL = 'https://fluffy-tribble-vx7r9vp5v7j2579-3000.app.github.dev/servicos';
+        const USERS_URL = 'https://fluffy-tribble-vx7r9vp5v7j2579-3000.app.github.dev/users';
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            alert('Você precisa estar autenticado');
+            window.location.href = '/login';
+        }
+
+        // Carregar dados ao iniciar - [Seu Nome]
+        carregarAgendamentos();
+        carregarPets();
+        carregarServicos();
+        carregarUsers();
+
+        // Formulário submit - [Seu Nome]
+        document.getElementById('agendamentoForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('id').value;
+            const agendamento = {
+                pet_id: parseInt(document.getElementById('pet_id').value),
+                servico_id: parseInt(document.getElementById('servico_id').value),
+                user_id: parseInt(document.getElementById('user_id').value),
+                data_hora: document.getElementById('data_hora').value,
+                status: document.getElementById('status').value
+            };
+
+            if (id) {
+                atualizarAgendamento(id, agendamento);
+            } else {
+                criarAgendamento(agendamento);
+            }
+        });
+
+        // Carregar agendamentos - [Seu Nome]
+        function carregarAgendamentos() {
+            fetch(API_URL, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(agendamentos => {
+                const tabela = document.getElementById('agendamentosTable');
+                tabela.innerHTML = '';
+                
+                if (Array.isArray(agendamentos) && agendamentos.length > 0) {
+                    agendamentos.forEach(a => {
+                        const row = `
+                            <tr>
+                                <td>${a.id}</td>
+                                <td>${a.pet_name || '-'}</td>
+                                <td>${a.servico_name || '-'}</td>
+                                <td>${a.tutor_name || '-'}</td>
+                                <td>${new Date(a.data_hora).toLocaleString('pt-BR')}</td>
+                                <td>${a.status}</td>
+                                <td>
+                                    <button class="btn btn-editar" onclick="editarAgendamento(${a.id})">Editar</button>
+                                    <button class="btn btn-deletar" onclick="deletarAgendamento(${a.id})">Deletar</button>
+                                </td>
+                            </tr>
+                        `;
+                        tabela.innerHTML += row;
+                    });
+                } else {
+                    tabela.innerHTML = '<tr><td colspan="7" style="text-align:center;">Nenhum agendamento</td></tr>';
+                }
+            })
+            .catch(err => console.error('Erro:', err));
+        }
+
+        // Carregar pets - [Seu Nome]
+        function carregarPets() {
+            fetch(PETS_URL, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(pets => {
+                const select = document.getElementById('pet_id');
+                select.innerHTML = '<option value="">Selecione um pet...</option>';
+                pets.forEach(p => {
+                    const option = document.createElement('option');
+                    option.value = p.id;
+                    option.textContent = p.name;
+                    select.appendChild(option);
+                });
+            })
+            .catch(err => console.error('Erro:', err));
+        }
+
+        // Carregar serviços - [Seu Nome]
+        function carregarServicos() {
+            fetch(SERVICOS_URL, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(servicos => {
+                const select = document.getElementById('servico_id');
+                select.innerHTML = '<option value="">Selecione um serviço...</option>';
+                servicos.forEach(s => {
+                    const option = document.createElement('option');
+                    option.value = s.id;
+                    option.textContent = `${s.name} - R$ ${s.price.toFixed(2)}`;
+                    select.appendChild(option);
+                });
+            })
+            .catch(err => console.error('Erro:', err));
+        }
+
+        // Carregar usuários - [Seu Nome]
+        function carregarUsers() {
+            fetch(USERS_URL, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(users => {
+                const select = document.getElementById('user_id');
+                select.innerHTML = '<option value="">Selecione um tutor...</option>';
+                users.forEach(u => {
+                    const option = document.createElement('option');
+                    option.value = u.id;
+                    option.textContent = u.username;
+                    select.appendChild(option);
+                });
+            })
+            .catch(err => console.error('Erro:', err));
+        }
+
+        // Criar agendamento - [Seu Nome]
+        function criarAgendamento(agendamento) {
+            fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(agendamento)
+            })
+            .then(res => res.json())
+            .then(data => {
+                mostrarMensagem('Agendamento criado!', 'success');
+                document.getElementById('agendamentoForm').reset();
+                carregarAgendamentos();
+            })
+            .catch(err => mostrarMensagem('Erro na conexão', 'error'));
+        }
+
+        // Editar agendamento - [Seu Nome]
+        function editarAgendamento(id) {
+            fetch(`${API_URL}/${id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(agendamento => {
+                document.getElementById('id').value = agendamento.id;
+                document.getElementById('pet_id').value = agendamento.pet_id;
+                document.getElementById('servico_id').value = agendamento.servico_id;
+                document.getElementById('user_id').value = agendamento.user_id;
+                document.getElementById('data_hora').value = agendamento.data_hora;
+                document.getElementById('status').value = agendamento.status;
+            })
+            .catch(err => mostrarMensagem('Erro ao buscar', 'error'));
+        }
+
+        // Atualizar agendamento - [Seu Nome]
+        function atualizarAgendamento(id, agendamento) {
+            fetch(`${API_URL}/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(agendamento)
+            })
+            .then(res => res.json())
+            .then(data => {
+                mostrarMensagem('Agendamento atualizado!', 'success');
+                document.getElementById('agendamentoForm').reset();
+                document.getElementById('id').value = '';
+                carregarAgendamentos();
+            })
+            .catch(err => mostrarMensagem('Erro na conexão', 'error'));
+        }
+
+        // Deletar agendamento - [Seu Nome]
+        function deletarAgendamento(id) {
+            if (confirm('Tem certeza?')) {
+                fetch(`${API_URL}/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    mostrarMensagem('Agendamento deletado!', 'success');
+                    carregarAgendamentos();
+                })
+                .catch(err => mostrarMensagem('Erro ao deletar', 'error'));
+            }
+        }
+
+        // Logout - [Seu Nome]
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+        }
+
+        // Mostrar mensagem - [Seu Nome]
+        function mostrarMensagem(msg, tipo) {
+            const div = document.getElementById('message');
+            div.textContent = msg;
+            div.className = tipo;
+            setTimeout(() => div.textContent = '', 3000);
+        }
+    </script>
+</body>
+</html>

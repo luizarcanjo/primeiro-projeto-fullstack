@@ -8,6 +8,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var petsRouter = require('./routes/pets');
 var servicosRouter = require('./routes/servicos');
+var agendamentosRouter = require('./routes/agendamentos');
 
 var app = express();
 
@@ -24,6 +25,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/pets', petsRouter);
 app.use('/servicos', servicosRouter);
+app.use('/agendamentos', agendamentosRouter);
 
 app.use(function(req, res, next) {
   next(createError(404));

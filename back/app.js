@@ -26,11 +26,13 @@ var usersRouter = require('./routes/users');
 var petsRouter = require('./routes/pets');
 var authRouter = require('./routes/auth');
 var servicosRouter = require('./routes/servicos');
+var agendamentosRouter = require('./routes/agendamentos');
 
 //define os endpoints para as rotas
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/pets', petsRouter);
+app.use('/agendamentos', agendamentosRouter);
 
  
 // view engine setup 
