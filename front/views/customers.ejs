@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers - Petshop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        nav { background: #333; color: white; padding: 15px 0; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
+        nav a { color: white; margin: 0 15px; text-decoration: none; }
+        nav a:hover { color: #4CAF50; }
+        nav button { background: #d32f2f; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        nav button:hover { background: #c62828; }
+        main { max-width: 1200px; margin: 20px auto; padding: 20px; background: white; border-radius: 8px; }
+        h1 { margin-bottom: 20px; color: #333; }
+        form { background: #f9f9f9; padding: 20px; border-radius: 5px; margin-bottom: 30px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button[type="submit"] { background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: auto; }
+        button[type="submit"]:hover { background: #45a049; }
+        button[type="reset"] { background: #999; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #4CAF50; color: white; }
+        tr:hover { background: #f5f5f5; }
+        .btn { padding: 6px 12px; margin: 0 5px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-editar { background: #2196F3; color: white; }
+        .btn-deletar { background: #f44336; color: white; }
+        .error { color: #d32f2f; margin-bottom: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div>
+            <a href="/">🏠 Home</a>
+            <a href="/servicos">🛁 Serviços</a>
+            <a href="/pets">🐾 Pets</a>
+            <a href="/agendamentos">📅 Agendamentos</a>
+            <a href="/customers">👥 Customers</a>
+        </div>
+        <button onclick="logout()">🚪 Sair</button>
+    </nav>
+
+    <main>
+        <h1>👥 Gestão de Customers</h1>
+
+        <form id="customerForm">
+            <input type="hidden" id="id">
+            
+            <div class="form-group">
+                <label for="username">Nome</label>
+                <input name="username" id="username" type="text" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input name="email" id="email" type="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Telefone</label>
+                <input name="phone" id="phone" type="text" required>
+            </div>
+
+            <button type="submit">Salvar</button>
+            <button type="reset">Cancelar</button>
+        </form>
+
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="customersTable">
+            </tbody>
+        </table>
+    </main>
+
+    <script>
+        // Variáveis globais - [Seu Nome]
+        const API_URL = 'https://fluffy-tribble-vx7r9vp5v7j2579-3000.app.github.dev/customers';
+        const token = localStorage.getItem('token');
+        const idInput = document.getElementById('id');
+        const form = document.getElementById('customerForm');
+
+        // Verificar autenticação - [Seu Nome]
+        if (!token) {
+            alert('Você precisa estar autenticado');
+            window.location.href = '/login';
+        }
+
+        // Carregar customers ao iniciar - [Seu Nome]
+        carregarCustomers();
+
+        // Formulário submit - [Seu Nome]
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            
+            const customer = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value
+            };
+
+            if (idInput.value) {
+                atualizarCustomer(idInput.value, customer);
+            } else {
+                criarCustomer(customer);
+            }
+        });
+
+        // Carregar customers - [Seu Nome]
+        function carregarCustomers() {
+            fetch(API_URL, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(customers => {
+                const tabela = document.getElementById('customersTable');
+                tabela.innerHTML = '';
+                
+                if (Array.isArray(customers) && customers.length > 0) {
+                    customers.forEach(c => {
+                        const row = `
+                            <tr>
+                                <td>${c.id}</td>
+                                <td>${c.username}</td>
+                                <td>${c.email}</td>
+                                <td>${c.phone}</td>
+                                <td>
+                                    <button class="btn btn-editar" onclick="editarCustomer(${c.id})">Editar</button>
+                                    <button class="btn btn-deletar" onclick="deletarCustomer(${c.id})">Deletar</button>
+                                </td>
+                            </tr>
+                        `;
+                        tabela.innerHTML += row;
+                    });
+                } else {
+                    tabela.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum customer cadastrado</td></tr>';
+                }
+            })
+            .catch(err => {
+                console.error('Erro:', err);
+            });
+        }
+
+        // Criar customer - [Seu Nome]
+        function criarCustomer(customer) {
+            fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(customer)
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert('Customer criado com sucesso!');
+                form.reset();
+                idInput.value = '';
+                carregarCustomers();
+            })
+            .catch(err => {
+                console.error('Erro:', err);
+                alert('Erro ao criar customer');
+            });
+        }
+
+        // Editar customer - [Seu Nome]
+        function editarCustomer(id) {
+            fetch(`${API_URL}/${id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(customer => {
+                document.getElementById('id').value = customer.id;
+                document.getElementById('username').value = customer.username;
+                document.getElementById('email').value = customer.email;
+                document.getElementById('phone').value = customer.phone;
+                form.scrollIntoView({ behavior: 'smooth' });
+            })
+            .catch(err => {
+                console.error('Erro:', err);
+                alert('Erro ao buscar customer');
+            });
+        }
+
+        // Atualizar customer - [Seu Nome]
+        function atualizarCustomer(id, customer) {
+            fetch(`${API_URL}/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(customer)
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert('Customer atualizado com sucesso!');
+                form.reset();
+                idInput.value = '';
+                carregarCustomers();
+            })
+            .catch(err => {
+                console.error('Erro:', err);
+                alert('Erro ao atualizar customer');
+            });
+        }
+
+        // Deletar customer - [Seu Nome]
+        function deletarCustomer(id) {
+            if (confirm('Tem certeza que deseja deletar este customer?')) {
+                fetch(`${API_URL}/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    alert('Customer deletado!');
+                    carregarCustomers();
+                })
+                .catch(err => {
+                    console.error('Erro:', err);
+                    alert('Erro ao deletar customer');
+                });
+            }
+        }
+
+        // Logout - [Seu Nome]
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            document.cookie = 'token=; path=/; max-age=0';
+            window.location.href = '/login';
+        }
+    </script>
+</body>
+</html>
