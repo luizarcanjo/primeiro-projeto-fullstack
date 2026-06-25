@@ -1,4 +1,4 @@
-// Autenticação JWT - [Seu Nome]
+// Autenticação JWT - Admin/Gestores - [Seu Nome]
 var express = require('express');
 var router = express.Router();
 var sqlite3 = require("sqlite3");
@@ -7,24 +7,25 @@ var bcryptjs = require('bcryptjs');
 
 const db = new sqlite3.Database('./database/database.db');
 
-// Criar tabela users com senha - [Seu Nome]
+// Criar tabela admins (gestores/funcionários) - [Seu Nome]
 db.run(`
-  CREATE TABLE IF NOT EXISTS users(
+  CREATE TABLE IF NOT EXISTS admins(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE,
     password TEXT,
     email TEXT UNIQUE,
-    phone TEXT UNIQUE
+    phone TEXT UNIQUE,
+    role TEXT DEFAULT 'admin'
   )
 `, (err) => {
   if (err) {
-    console.error('Erro ao criar tabela users:', err);
+    console.error('Erro ao criar tabela admins:', err);
   } else {
-    console.log('Tabela users pronta!');
+    console.log('Tabela admins pronta!');
   }
 });
 
-// POST - Registrar novo usuário - [Seu Nome]
+// POST - Registrar novo admin - [Seu Nome]
 router.post('/register', (req, res) => {
   const { username, password, email, phone } = req.body;
 
@@ -36,19 +37,19 @@ router.post('/register', (req, res) => {
   const hashedPassword = bcryptjs.hashSync(password, 10);
 
   db.run(
-    'INSERT INTO users (username, password, email, phone) VALUES (?, ?, ?, ?)',
-    [username, hashedPassword, email, phone],
+    'INSERT INTO admins (username, password, email, phone, role) VALUES (?, ?, ?, ?, ?)',
+    [username, hashedPassword, email, phone, 'admin'],
     (err) => {
       if (err) {
         console.error('Erro ao registrar:', err);
-        return res.status(500).json({ error: 'Erro ao registrar usuário' });
+        return res.status(500).json({ error: 'Erro ao registrar admin' });
       }
-      res.status(201).json({ message: 'Usuário registrado com sucesso' });
+      res.status(201).json({ message: 'Admin registrado com sucesso' });
     }
   );
 });
 
-// POST - Login - [Seu Nome]
+// POST - Login de admin - [Seu Nome]
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -56,25 +57,25 @@ router.post('/login', (req, res) => {
     return res.status(400).json({ error: 'Email e senha obrigatórios' });
   }
 
-  // Buscar usuário - [Seu Nome]
-  db.get('SELECT * FROM users WHERE email = ?', [email], (err, user) => {
+  // Buscar admin - [Seu Nome]
+  db.get('SELECT * FROM admins WHERE email = ?', [email], (err, admin) => {
     if (err) {
-      return res.status(500).json({ error: 'Erro ao buscar usuário' });
+      return res.status(500).json({ error: 'Erro ao buscar admin' });
     }
 
-    if (!user) {
+    if (!admin) {
       return res.status(401).json({ error: 'Email ou senha incorretos' });
     }
 
     // Validar senha - [Seu Nome]
-    const isValidPassword = bcryptjs.compareSync(password, user.password);
+    const isValidPassword = bcryptjs.compareSync(password, admin.password);
     if (!isValidPassword) {
       return res.status(401).json({ error: 'Email ou senha incorretos' });
     }
 
     // Gerar JWT token - [Seu Nome]
     const token = jwt.sign(
-      { id: user.id, email: user.email, username: user.username },
+      { id: admin.id, email: admin.email, username: admin.username, role: admin.role },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN }
     );
@@ -82,7 +83,7 @@ router.post('/login', (req, res) => {
     res.status(200).json({
       message: 'Login realizado com sucesso',
       token: token,
-      user: { id: user.id, username: user.username, email: user.email }
+      admin: { id: admin.id, username: admin.username, email: admin.email, role: admin.role }
     });
   });
 });
