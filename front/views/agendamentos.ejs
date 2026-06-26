@@ -1,40 +1,156 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agendamentos - Petshop</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; }
-        nav { background: #333; color: white; padding: 15px 0; }
-        nav a { color: white; margin: 0 20px; text-decoration: none; }
-        nav a:hover { color: #FF9800; }
-        nav button { background: #d32f2f; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin: 0 20px; }
-        main { max-width: 1200px; margin: 20px auto; padding: 20px; background: white; border-radius: 8px; }
-        h1 { margin-bottom: 20px; color: #333; }
-        form { background: #f9f9f9; padding: 20px; border-radius: 5px; margin-bottom: 30px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
-        button[type="submit"] { background: #FF9800; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: auto; }
-        button[type="submit"]:hover { background: #F57C00; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #FF9800; color: white; }
-        .btn { padding: 6px 12px; margin: 0 5px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
-        .btn-editar { background: #2196F3; color: white; }
-        .btn-deletar { background: #f44336; color: white; }
-        .success { color: #4CAF50; margin-bottom: 10px; }
-        .error { color: #d32f2f; margin-bottom: 10px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        nav {
+            background: #333;
+            color: white;
+            padding: 15px 0;
+        }
+
+        nav a {
+            color: white;
+            margin: 0 20px;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            color: #FF9800;
+        }
+
+        nav button {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 20px;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        form {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button[type="submit"] {
+            background: #FF9800;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            width: auto;
+        }
+
+        button[type="submit"]:hover {
+            background: #F57C00;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #FF9800;
+            color: white;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-editar {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-deletar {
+            background: #f44336;
+            color: white;
+        }
+
+        .success {
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+
+        .error {
+            color: #d32f2f;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
+
 <body>
-     <nav>
+    <nav>
         <a href="/">🏠 Home</a>
         <a href="/servicos">🛁 Serviços</a>
         <a href="/pets">🐾 Pets</a>
-        <a href="/users">👥 Usuários</a>
+        <a href="/customers">👥 Customers</a>
         <a href="/agendamentos">📅 Agendamentos</a>
         <button onclick="logout()">Sair</button>
     </nav>
@@ -46,7 +162,7 @@
 
         <form id="agendamentoForm">
             <input type="hidden" id="id">
-            
+
             <div class="form-group">
                 <label for="pet_id">🐾 Pet</label>
                 <select id="pet_id" required>
@@ -84,7 +200,8 @@
             </div>
 
             <button type="submit">Agendar</button>
-            <button type="reset" style="background: #999; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: auto;">Cancelar</button>
+            <button type="reset"
+                style="background: #999; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: auto;">Cancelar</button>
         </form>
 
         <table border="1">
@@ -109,7 +226,7 @@
         const API_URL = 'https://fluffy-tribble-vx7r9vp5v7j2579-3000.app.github.dev/agendamentos';
         const PETS_URL = 'https://fluffy-tribble-vx7r9vp5v7j2579-3000.app.github.dev/pets';
         const SERVICOS_URL = 'https://fluffy-tribble-vx7r9vp5v7j2579-3000.app.github.dev/servicos';
-        const USERS_URL = 'https://fluffy-tribble-vx7r9vp5v7j2579-3000.app.github.dev/users';
+        const USERS_URL = 'https://fluffy-tribble-vx7r9vp5v7j2579-3000.app.github.dev/customers';
         const token = localStorage.getItem('token');
 
         if (!token) {
@@ -147,14 +264,14 @@
             fetch(API_URL, {
                 headers: { 'Authorization': `Bearer ${token}` }
             })
-            .then(res => res.json())
-            .then(agendamentos => {
-                const tabela = document.getElementById('agendamentosTable');
-                tabela.innerHTML = '';
-                
-                if (Array.isArray(agendamentos) && agendamentos.length > 0) {
-                    agendamentos.forEach(a => {
-                        const row = `
+                .then(res => res.json())
+                .then(agendamentos => {
+                    const tabela = document.getElementById('agendamentosTable');
+                    tabela.innerHTML = '';
+
+                    if (Array.isArray(agendamentos) && agendamentos.length > 0) {
+                        agendamentos.forEach(a => {
+                            const row = `
                             <tr>
                                 <td>${a.id}</td>
                                 <td>${a.pet_name || '-'}</td>
@@ -168,13 +285,13 @@
                                 </td>
                             </tr>
                         `;
-                        tabela.innerHTML += row;
-                    });
-                } else {
-                    tabela.innerHTML = '<tr><td colspan="7" style="text-align:center;">Nenhum agendamento</td></tr>';
-                }
-            })
-            .catch(err => console.error('Erro:', err));
+                            tabela.innerHTML += row;
+                        });
+                    } else {
+                        tabela.innerHTML = '<tr><td colspan="7" style="text-align:center;">Nenhum agendamento</td></tr>';
+                    }
+                })
+                .catch(err => console.error('Erro:', err));
         }
 
         // Carregar pets - [Seu Nome]
@@ -182,18 +299,18 @@
             fetch(PETS_URL, {
                 headers: { 'Authorization': `Bearer ${token}` }
             })
-            .then(res => res.json())
-            .then(pets => {
-                const select = document.getElementById('pet_id');
-                select.innerHTML = '<option value="">Selecione um pet...</option>';
-                pets.forEach(p => {
-                    const option = document.createElement('option');
-                    option.value = p.id;
-                    option.textContent = p.name;
-                    select.appendChild(option);
-                });
-            })
-            .catch(err => console.error('Erro:', err));
+                .then(res => res.json())
+                .then(pets => {
+                    const select = document.getElementById('pet_id');
+                    select.innerHTML = '<option value="">Selecione um pet...</option>';
+                    pets.forEach(p => {
+                        const option = document.createElement('option');
+                        option.value = p.id;
+                        option.textContent = p.name;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(err => console.error('Erro:', err));
         }
 
         // Carregar serviços - [Seu Nome]
@@ -201,18 +318,18 @@
             fetch(SERVICOS_URL, {
                 headers: { 'Authorization': `Bearer ${token}` }
             })
-            .then(res => res.json())
-            .then(servicos => {
-                const select = document.getElementById('servico_id');
-                select.innerHTML = '<option value="">Selecione um serviço...</option>';
-                servicos.forEach(s => {
-                    const option = document.createElement('option');
-                    option.value = s.id;
-                    option.textContent = `${s.name} - R$ ${s.price.toFixed(2)}`;
-                    select.appendChild(option);
-                });
-            })
-            .catch(err => console.error('Erro:', err));
+                .then(res => res.json())
+                .then(servicos => {
+                    const select = document.getElementById('servico_id');
+                    select.innerHTML = '<option value="">Selecione um serviço...</option>';
+                    servicos.forEach(s => {
+                        const option = document.createElement('option');
+                        option.value = s.id;
+                        option.textContent = `${s.name} - R$ ${s.price.toFixed(2)}`;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(err => console.error('Erro:', err));
         }
 
         // Carregar usuários - [Seu Nome]
@@ -220,18 +337,18 @@
             fetch(USERS_URL, {
                 headers: { 'Authorization': `Bearer ${token}` }
             })
-            .then(res => res.json())
-            .then(users => {
-                const select = document.getElementById('user_id');
-                select.innerHTML = '<option value="">Selecione um tutor...</option>';
-                users.forEach(u => {
-                    const option = document.createElement('option');
-                    option.value = u.id;
-                    option.textContent = u.username;
-                    select.appendChild(option);
-                });
-            })
-            .catch(err => console.error('Erro:', err));
+                .then(res => res.json())
+                .then(users => {
+                    const select = document.getElementById('user_id');
+                    select.innerHTML = '<option value="">Selecione um tutor...</option>';
+                    users.forEach(u => {
+                        const option = document.createElement('option');
+                        option.value = u.id;
+                        option.textContent = u.username;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(err => console.error('Erro:', err));
         }
 
         // Criar agendamento - [Seu Nome]
@@ -244,13 +361,13 @@
                 },
                 body: JSON.stringify(agendamento)
             })
-            .then(res => res.json())
-            .then(data => {
-                mostrarMensagem('Agendamento criado!', 'success');
-                document.getElementById('agendamentoForm').reset();
-                carregarAgendamentos();
-            })
-            .catch(err => mostrarMensagem('Erro na conexão', 'error'));
+                .then(res => res.json())
+                .then(data => {
+                    mostrarMensagem('Agendamento criado!', 'success');
+                    document.getElementById('agendamentoForm').reset();
+                    carregarAgendamentos();
+                })
+                .catch(err => mostrarMensagem('Erro na conexão', 'error'));
         }
 
         // Editar agendamento - [Seu Nome]
@@ -258,16 +375,16 @@
             fetch(`${API_URL}/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             })
-            .then(res => res.json())
-            .then(agendamento => {
-                document.getElementById('id').value = agendamento.id;
-                document.getElementById('pet_id').value = agendamento.pet_id;
-                document.getElementById('servico_id').value = agendamento.servico_id;
-                document.getElementById('user_id').value = agendamento.user_id;
-                document.getElementById('data_hora').value = agendamento.data_hora;
-                document.getElementById('status').value = agendamento.status;
-            })
-            .catch(err => mostrarMensagem('Erro ao buscar', 'error'));
+                .then(res => res.json())
+                .then(agendamento => {
+                    document.getElementById('id').value = agendamento.id;
+                    document.getElementById('pet_id').value = agendamento.pet_id;
+                    document.getElementById('servico_id').value = agendamento.servico_id;
+                    document.getElementById('user_id').value = agendamento.user_id;
+                    document.getElementById('data_hora').value = agendamento.data_hora;
+                    document.getElementById('status').value = agendamento.status;
+                })
+                .catch(err => mostrarMensagem('Erro ao buscar', 'error'));
         }
 
         // Atualizar agendamento - [Seu Nome]
@@ -280,14 +397,14 @@
                 },
                 body: JSON.stringify(agendamento)
             })
-            .then(res => res.json())
-            .then(data => {
-                mostrarMensagem('Agendamento atualizado!', 'success');
-                document.getElementById('agendamentoForm').reset();
-                document.getElementById('id').value = '';
-                carregarAgendamentos();
-            })
-            .catch(err => mostrarMensagem('Erro na conexão', 'error'));
+                .then(res => res.json())
+                .then(data => {
+                    mostrarMensagem('Agendamento atualizado!', 'success');
+                    document.getElementById('agendamentoForm').reset();
+                    document.getElementById('id').value = '';
+                    carregarAgendamentos();
+                })
+                .catch(err => mostrarMensagem('Erro na conexão', 'error'));
         }
 
         // Deletar agendamento - [Seu Nome]
@@ -297,12 +414,12 @@
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${token}` }
                 })
-                .then(res => res.json())
-                .then(data => {
-                    mostrarMensagem('Agendamento deletado!', 'success');
-                    carregarAgendamentos();
-                })
-                .catch(err => mostrarMensagem('Erro ao deletar', 'error'));
+                    .then(res => res.json())
+                    .then(data => {
+                        mostrarMensagem('Agendamento deletado!', 'success');
+                        carregarAgendamentos();
+                    })
+                    .catch(err => mostrarMensagem('Erro ao deletar', 'error'));
             }
         }
 
@@ -322,4 +439,5 @@
         }
     </script>
 </body>
+
 </html>

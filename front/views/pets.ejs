@@ -1,45 +1,180 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pets - Petshop</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; }
-        nav { background: #333; color: white; padding: 15px 0; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
-        nav a { color: white; margin: 0 15px; text-decoration: none; }
-        nav a:hover { color: #FF9800; }
-        nav button { background: #d32f2f; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        nav button:hover { background: #c62828; }
-        main { max-width: 1200px; margin: 20px auto; padding: 20px; background: white; border-radius: 8px; }
-        h1 { margin-bottom: 20px; color: #333; }
-        form { background: #f9f9f9; padding: 20px; border-radius: 5px; margin-bottom: 30px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
-        button[type="submit"] { background: #FF9800; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: auto; }
-        button[type="submit"]:hover { background: #F57C00; }
-        button[type="reset"] { background: #999; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #FF9800; color: white; }
-        tr:hover { background: #f5f5f5; }
-        .btn { padding: 6px 12px; margin: 0 5px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
-        .btn-editar { background: #2196F3; color: white; }
-        .btn-deletar { background: #f44336; color: white; }
-        .tutor-badge { background: #4CAF50; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        nav {
+            background: #333;
+            color: white;
+            padding: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            color: #FF9800;
+        }
+
+        nav button {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        nav button:hover {
+            background: #c62828;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        form {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button[type="submit"] {
+            background: #FF9800;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            width: auto;
+        }
+
+        button[type="submit"]:hover {
+            background: #F57C00;
+        }
+
+        button[type="reset"] {
+            background: #999;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #FF9800;
+            color: white;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-editar {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-deletar {
+            background: #f44336;
+            color: white;
+        }
+
+        .tutor-badge {
+            background: #4CAF50;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
     </style>
 </head>
+
 <body>
     <nav>
-        <div>
-            <a href="/">🏠 Home</a>
-            <a href="/servicos">🛁 Serviços</a>
-            <a href="/pets">🐾 Pets</a>
-            <a href="/agendamentos">📅 Agendamentos</a>
-            <a href="/customers">👥 Customers</a>
-        </div>
+       <nav>
+        <a href="/">🏠 Home</a>
+        <a href="/servicos">🛁 Serviços</a>
+        <a href="/pets">🐾 Pets</a>
+        <a href="/customers">👥 Customers</a>
+        <a href="/agendamentos">📅 Agendamentos</a>
+    </nav>
         <button onclick="logout()">🚪 Sair</button>
     </nav>
 
@@ -48,12 +183,12 @@
 
         <form id="petForm">
             <input type="hidden" id="id">
-            
+
             <div class="form-group">
                 <label for="name">Nome do Pet</label>
                 <input name="name" id="name" type="text" required>
             </div>
-            
+
             <div class="form-group">
                 <label for="type">Tipo</label>
                 <select name="type" id="type" required>
@@ -67,17 +202,17 @@
                     <option value="Outro">Outro</option>
                 </select>
             </div>
-            
+
             <div class="form-group">
                 <label for="race">Raça</label>
                 <input name="race" id="race" type="text" required>
             </div>
-            
+
             <div class="form-group">
                 <label for="colour">Cor</label>
                 <input name="colour" id="colour" type="text" required>
             </div>
-            
+
             <div class="form-group">
                 <label for="gender">Gênero</label>
                 <select name="gender" id="gender" required>
@@ -93,7 +228,7 @@
                     <option value="">Selecione um customer...</option>
                 </select>
             </div>
-            
+
             <button type="submit">Salvar</button>
             <button type="reset">Cancelar</button>
         </form>
@@ -134,7 +269,7 @@
 
         form.addEventListener("submit", (e) => {
             e.preventDefault();
-            
+
             const pet = {
                 name: document.getElementById('name').value,
                 type: document.getElementById('type').value,
@@ -160,67 +295,65 @@
             fetch(API_URL, {
                 headers: { 'Authorization': `Bearer ${token}` }
             })
-            .then(res => res.json())
-            .then(pets => {
-                const tabela = document.getElementById('petsTable');
-                tabela.innerHTML = '';
-                
-                if (Array.isArray(pets) && pets.length > 0) {
-                    pets.forEach(p => {
-                        const row = `
-                            <tr>
-                                <td>${p.id}</td>
-                                <td>${p.name}</td>
-                                <td>${p.type}</td>
-                                <td>${p.race}</td>
-                                <td>${p.colour}</td>
-                                <td>${p.gender}</td>
-                                <td>
-                                    <% if(p.customer_name){ %>
-                                        <span class="tutor-badge">${p.customer_name}</span>
-                                    <% } else { %>
-                                        <span style="color: #999;">Sem customer</span>
-                                    <% } %>
-                                </td>
-                                <td>
-                                    <button class="btn btn-editar" onclick="editarPet(${p.id})">Editar</button>
-                                    <button class="btn btn-deletar" onclick="deletarPet(${p.id})">Deletar</button>
-                                </td>
-                            </tr>
-                        `;
-                        tabela.innerHTML += row;
-                    });
-                } else {
-                    tabela.innerHTML = '<tr><td colspan="8" style="text-align:center;">Nenhum pet cadastrado</td></tr>';
-                }
-            })
-            .catch(err => console.error('Erro:', err));
+                .then(res => res.json())
+                .then(pets => {
+                    const tabela = document.getElementById('petsTable');
+                    tabela.innerHTML = '';
+
+                    if (Array.isArray(pets) && pets.length > 0) {
+                        pets.forEach(p => {
+                            const customerDisplay = p.customer_name
+                                ? `<span class="tutor-badge">${p.customer_name}</span>`
+                                : `<span style="color: #999;">Sem customer</span>`;
+
+                            const row = `
+        <tr>
+            <td>${p.id}</td>
+            <td>${p.name}</td>
+            <td>${p.type}</td>
+            <td>${p.race}</td>
+            <td>${p.colour}</td>
+            <td>${p.gender}</td>
+            <td>${customerDisplay}</td>
+            <td>
+                <button class="btn btn-editar" onclick="editarPet(${p.id})">Editar</button>
+                <button class="btn btn-deletar" onclick="deletarPet(${p.id})">Deletar</button>
+            </td>
+        </tr>
+    `;
+                            tabela.innerHTML += row;
+                        });
+                    } else {
+                        tabela.innerHTML = '<tr><td colspan="8" style="text-align:center;">Nenhum pet cadastrado</td></tr>';
+                    }
+                })
+                .catch(err => console.error('Erro:', err));
         }
 
         function carregarCustomers() {
             fetch(CUSTOMERS_API_URL, {
                 headers: { 'Authorization': `Bearer ${token}` }
             })
-            .then(res => res.json())
-            .then(customers => {
-                const select = document.getElementById('customer_id');
-                select.innerHTML = '<option value="">Selecione um customer...</option>';
-                
-                if (Array.isArray(customers) && customers.length > 0) {
-                    customers.forEach(c => {
+                .then(res => res.json())
+                .then(customers => {
+                    const select = document.getElementById('customer_id');
+                    select.innerHTML = '<option value="">Selecione um customer...</option>';
+
+                    if (Array.isArray(customers) && customers.length > 0) {
+                        customers.forEach(c => {
+                            const option = document.createElement('option');
+                            option.value = c.id;
+                            option.textContent = c.username;
+                            select.appendChild(option);
+                        });
+                    } else {
                         const option = document.createElement('option');
-                        option.value = c.id;
-                        option.textContent = c.username;
+                        option.disabled = true;
+                        option.textContent = 'Nenhum customer disponível';
                         select.appendChild(option);
-                    });
-                } else {
-                    const option = document.createElement('option');
-                    option.disabled = true;
-                    option.textContent = 'Nenhum customer disponível';
-                    select.appendChild(option);
-                }
-            })
-            .catch(err => console.error('Erro:', err));
+                    }
+                })
+                .catch(err => console.error('Erro:', err));
         }
 
         function criarPet(pet) {
@@ -232,17 +365,17 @@
                 },
                 body: JSON.stringify(pet)
             })
-            .then(res => res.json())
-            .then(data => {
-                alert('Pet criado!');
-                form.reset();
-                idInput.value = '';
-                carregarPets();
-            })
-            .catch(err => {
-                console.error('Erro:', err);
-                alert('Erro ao criar pet!');
-            });
+                .then(res => res.json())
+                .then(data => {
+                    alert('Pet criado!');
+                    form.reset();
+                    idInput.value = '';
+                    carregarPets();
+                })
+                .catch(err => {
+                    console.error('Erro:', err);
+                    alert('Erro ao criar pet!');
+                });
         }
 
         function atualizarPet(id, pet) {
@@ -254,38 +387,38 @@
                 },
                 body: JSON.stringify(pet)
             })
-            .then(res => res.json())
-            .then(data => {
-                alert('Pet atualizado!');
-                form.reset();
-                idInput.value = '';
-                carregarPets();
-            })
-            .catch(err => {
-                console.error('Erro:', err);
-                alert('Erro ao atualizar pet!');
-            });
+                .then(res => res.json())
+                .then(data => {
+                    alert('Pet atualizado!');
+                    form.reset();
+                    idInput.value = '';
+                    carregarPets();
+                })
+                .catch(err => {
+                    console.error('Erro:', err);
+                    alert('Erro ao atualizar pet!');
+                });
         }
 
         function editarPet(id) {
             fetch(`${API_URL}/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             })
-            .then(res => res.json())
-            .then(pet => {
-                document.getElementById('id').value = pet.id;
-                document.getElementById('name').value = pet.name;
-                document.getElementById('type').value = pet.type;
-                document.getElementById('race').value = pet.race;
-                document.getElementById('colour').value = pet.colour;
-                document.getElementById('gender').value = pet.gender;
-                document.getElementById('customer_id').value = pet.customer_id || '';
-                form.scrollIntoView({ behavior: 'smooth' });
-            })
-            .catch(err => {
-                console.error('Erro:', err);
-                alert('Erro ao buscar pet!');
-            });
+                .then(res => res.json())
+                .then(pet => {
+                    document.getElementById('id').value = pet.id;
+                    document.getElementById('name').value = pet.name;
+                    document.getElementById('type').value = pet.type;
+                    document.getElementById('race').value = pet.race;
+                    document.getElementById('colour').value = pet.colour;
+                    document.getElementById('gender').value = pet.gender;
+                    document.getElementById('customer_id').value = pet.customer_id || '';
+                    form.scrollIntoView({ behavior: 'smooth' });
+                })
+                .catch(err => {
+                    console.error('Erro:', err);
+                    alert('Erro ao buscar pet!');
+                });
         }
 
         function deletarPet(id) {
@@ -294,15 +427,15 @@
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${token}` }
                 })
-                .then(res => res.json())
-                .then(data => {
-                    alert('Pet deletado!');
-                    carregarPets();
-                })
-                .catch(err => {
-                    console.error('Erro:', err);
-                    alert('Erro ao deletar pet!');
-                });
+                    .then(res => res.json())
+                    .then(data => {
+                        alert('Pet deletado!');
+                        carregarPets();
+                    })
+                    .catch(err => {
+                        console.error('Erro:', err);
+                        alert('Erro ao deletar pet!');
+                    });
             }
         }
 
@@ -315,4 +448,5 @@
         }
     </script>
 </body>
+
 </html>

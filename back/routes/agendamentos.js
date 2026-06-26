@@ -12,12 +12,12 @@ db.run(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     pet_id INTEGER,
     servico_id INTEGER,
-    user_id INTEGER,
+    customers_id INTEGER,
     data_hora TEXT,
     status TEXT DEFAULT 'pendente',
     FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE CASCADE,
     FOREIGN KEY (servico_id) REFERENCES servicos(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (customers_id) REFERENCES customers(id) ON DELETE CASCADE
   )
 `, (err) => {
   if (err) {
@@ -30,11 +30,11 @@ db.run(`
 // GET - Listar todos os agendamentos (protegido) - [Seu Nome]
 router.get('/', verifyToken, (req, res) => {
   const sql = `
-    SELECT a.*, p.name as pet_name, s.name as servico_name, u.username as tutor_name
+    SELECT a.*, p.name as pet_name, s.name as servico_name, c.name as tutor_name
     FROM agendamentos a
     LEFT JOIN pets p ON a.pet_id = p.id
     LEFT JOIN servicos s ON a.servico_id = s.id
-    LEFT JOIN users u ON a.user_id = u.id
+    LEFT JOIN customers c ON a.customers_id = c.id
     ORDER BY a.data_hora DESC
   `;
 
@@ -52,11 +52,11 @@ router.get('/:id', verifyToken, (req, res) => {
   const { id } = req.params;
 
   const sql = `
-    SELECT a.*, p.name as pet_name, s.name as servico_name, u.username as tutor_name
+    SELECT a.*, p.name as pet_name, s.name as servico_name, c.name as tutor_name
     FROM agendamentos a
     LEFT JOIN pets p ON a.pet_id = p.id
     LEFT JOIN servicos s ON a.servico_id = s.id
-    LEFT JOIN users u ON a.user_id = u.id
+    LEFT JOIN customers c ON a.customers_id = c.id
     WHERE a.id = ?
   `;
 
@@ -73,15 +73,15 @@ router.get('/:id', verifyToken, (req, res) => {
 
 // POST - Criar agendamento (protegido) - [Seu Nome]
 router.post('/', verifyToken, (req, res) => {
-  const { pet_id, servico_id, user_id, data_hora } = req.body;
+  const { pet_id, servico_id, customers_id, data_hora } = req.body;
 
-  if (!pet_id || !servico_id || !user_id || !data_hora) {
-    return res.status(400).json({ error: 'Campos obrigatórios: pet_id, servico_id, user_id, data_hora' });
+  if (!pet_id || !servico_id || !customers_id || !data_hora) {
+    return res.status(400).json({ error: 'Campos obrigatórios: pet_id, servico_id, customers_id, data_hora' });
   }
 
   db.run(
-    'INSERT INTO agendamentos (pet_id, servico_id, user_id, data_hora, status) VALUES (?, ?, ?, ?, ?)',
-    [pet_id, servico_id, user_id, data_hora, 'pendente'],
+    'INSERT INTO agendamentos (pet_id, servico_id, customers_id, data_hora, status) VALUES (?, ?, ?, ?, ?)',
+    [pet_id, servico_id, customers_id, data_hora, 'pendente'],
     (err) => {
       if (err) {
         console.error('Erro ao criar agendamento:', err);
@@ -95,11 +95,11 @@ router.post('/', verifyToken, (req, res) => {
 // PUT - Atualizar agendamento (protegido) - [Seu Nome]
 router.put('/:id', verifyToken, (req, res) => {
   const { id } = req.params;
-  const { pet_id, servico_id, user_id, data_hora, status } = req.body;
+  const { pet_id, servico_id, customers_id, data_hora, status } = req.body;
 
   db.run(
-    'UPDATE agendamentos SET pet_id = ?, servico_id = ?, user_id = ?, data_hora = ?, status = ? WHERE id = ?',
-    [pet_id, servico_id, user_id, data_hora, status, id],
+    'UPDATE agendamentos SET pet_id = ?, servico_id = ?, customers_id = ?, data_hora = ?, status = ? WHERE id = ?',
+    [pet_id, servico_id, customers_id, data_hora, status, id],
     function(err) {
       if (err) {
         return res.status(500).json({ error: 'Erro ao atualizar agendamento' });
