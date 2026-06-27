@@ -151,7 +151,6 @@
         <a href="/servicos">🛁 Serviços</a>
         <a href="/pets">🐾 Pets</a>
         <a href="/customers">👥 Customers</a>
-        <a href="/agendamentos">📅 Agendamentos</a>
         <button onclick="logout()">Sair</button>
     </nav>
 
@@ -226,7 +225,7 @@
         const API_URL = 'https://fluffy-tribble-vx7r9vp5v7j2579-3000.app.github.dev/agendamentos';
         const PETS_URL = 'https://fluffy-tribble-vx7r9vp5v7j2579-3000.app.github.dev/pets';
         const SERVICOS_URL = 'https://fluffy-tribble-vx7r9vp5v7j2579-3000.app.github.dev/servicos';
-        const USERS_URL = 'https://fluffy-tribble-vx7r9vp5v7j2579-3000.app.github.dev/customers';
+        const CUSTOMERS_URL = 'https://fluffy-tribble-vx7r9vp5v7j2579-3000.app.github.dev/customers';
         const token = localStorage.getItem('token');
 
         if (!token) {
@@ -247,7 +246,7 @@
             const agendamento = {
                 pet_id: parseInt(document.getElementById('pet_id').value),
                 servico_id: parseInt(document.getElementById('servico_id').value),
-                user_id: parseInt(document.getElementById('user_id').value),
+                customer_id: parseInt(document.getElementById('user_id').value),  // ← MUDE ISTO
                 data_hora: document.getElementById('data_hora').value,
                 status: document.getElementById('status').value
             };
@@ -334,14 +333,14 @@
 
         // Carregar usuários - [Seu Nome]
         function carregarUsers() {
-            fetch(USERS_URL, {
+            fetch(CUSTOMERS_URL, {
                 headers: { 'Authorization': `Bearer ${token}` }
             })
                 .then(res => res.json())
-                .then(users => {
+                .then(customers => {
                     const select = document.getElementById('user_id');
                     select.innerHTML = '<option value="">Selecione um tutor...</option>';
-                    users.forEach(u => {
+                    customers.forEach(u => {
                         const option = document.createElement('option');
                         option.value = u.id;
                         option.textContent = u.username;
@@ -380,7 +379,7 @@
                     document.getElementById('id').value = agendamento.id;
                     document.getElementById('pet_id').value = agendamento.pet_id;
                     document.getElementById('servico_id').value = agendamento.servico_id;
-                    document.getElementById('user_id').value = agendamento.user_id;
+                    document.getElementById('user_id').value = agendamento.customer_id;  // ← MUDE ISTO
                     document.getElementById('data_hora').value = agendamento.data_hora;
                     document.getElementById('status').value = agendamento.status;
                 })
